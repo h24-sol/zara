@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZARA | Global Sentinel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;500;700&display=swap');
+        body { background: #020205; color: #00f2ff; font-family: 'Rajdhani', sans-serif; }
+        .glass { background: rgba(0, 242, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(0, 242, 255, 0.1); }
+        .glow-text { text-shadow: 0 0 15px rgba(0, 242, 255, 0.6); }
+        .zara-avatar { filter: drop-shadow(0 0 30px rgba(0, 242, 255, 0.3)); border: 2px solid rgba(0, 242, 255, 0.2); }
+        .speaking-pulse { animation: pulse-border 1.5s infinite; }
+        @keyframes pulse-border { 0% { border-color: rgba(0, 242, 255, 0.2); } 50% { border-color: #00f2ff; } 100% { border-color: rgba(0, 242, 255, 0.2); } }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <nav class="p-6 border-b border-white/5 flex justify-between items-center glass">
+        <div class="flex flex-col">
+            <h1 class="text-2xl font-black tracking-[0.3em] uppercase Orbitron glow-text">ZARA <span class="text-white">v5.0</span></h1>
+            <p class="text-[10px] tracking-[0.5em] opacity-50 font-bold">SOVEREIGN INTELLIGENCE NETWORK</p>
+        </div>
+        <div class="flex gap-3">
+            <button id="btn-en" onclick="setLang('en')" class="px-4 py-1 rounded-full border border-cyan-500 bg-cyan-500 text-black text-xs font-bold transition-all">EN</button>
+            <button id="btn-bn" onclick="setLang('bn')" class="px-4 py-1 rounded-full border border-cyan-500 text-cyan-500 text-xs font-bold transition-all">BN</button>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
+        <div class="w-full md:w-5/12 flex flex-col items-center justify-center p-10 relative">
+            <div id="avatar-frame" class="zara-avatar w-72 h-96 rounded-3xl overflow-hidden bg-black/40">
+                <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800" 
+                     class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" alt="ZARA Visual">
+            </div>
+            <div class="mt-8 text-center max-w-sm">
+                <p id="zara-voice-display" class="text-xl italic font-light text-cyan-100 opacity-80 leading-relaxed">"System Ready. Awaiting global interrogation."</p>
+            </div>
+        </div>
+
+        <div class="w-full md:w-7/12 p-8 overflow-y-auto bg-white/[0.01]">
+            <div id="intel-container" class="space-y-6">
+                <div class="glass p-8 rounded-3xl border-l-4 border-l-cyan-500">
+                    <h3 class="text-[10px] tracking-[0.5em] text-cyan-400 mb-4 font-bold uppercase">Strategic Analysis</h3>
+                    <div id="intel-output" class="text-lg opacity-60 font-light leading-relaxed">
+                        Enter a global query to initiate real-time data synthesis...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="p-8 glass border-t border-white/5">
+        <div class="max-w-5xl mx-auto flex gap-4">
+            <input id="user-query" type="text" placeholder="QUERY: War, Crypto, Stocks, Geopolitics..." 
+                   class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-5 focus:border-cyan-500 outline-none text-xl transition-all uppercase placeholder:opacity-20">
+            <button onclick="interrogate()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-12 py-5 rounded-2xl font-black shadow-2xl shadow-cyan-500/20 active:scale-95 transition-all">
+                EXECUTE 🔥
+            </button>
+        </div>
+    </footer>
+
+    <script src="zara_brain.js"></script>
+</body>
+</html>
