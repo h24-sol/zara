@@ -1,61 +1,89 @@
+// ZARA v5.0 CORE BRAIN
 const API_KEY = 'd2fe03d609b8d0c74757ddf0addad1a1';
 let currentLang = 'en';
 
 function setLang(l) {
     currentLang = l;
-    document.getElementById('btn-en').className = l === 'en' ? 'px-4 py-1 rounded-full border border-cyan-500 bg-cyan-500 text-black text-xs font-bold' : 'px-4 py-1 rounded-full border border-cyan-500 text-cyan-500 text-xs font-bold';
-    document.getElementById('btn-bn').className = l === 'bn' ? 'px-4 py-1 rounded-full border border-cyan-500 bg-cyan-500 text-black text-xs font-bold' : 'px-4 py-1 rounded-full border border-cyan-500 text-cyan-500 text-xs font-bold';
+    document.getElementById('btn-en').className = l === 'en' ? 'px-4 py-1 rounded-full border border-cyan-500 bg-cyan-500 text-black text-xs font-bold' : 'px-4 py-1 rounded-full border border-cyan-500 text-cyan-500 text-xs font-bold transition-all hover:bg-cyan-500/20';
+    document.getElementById('btn-bn').className = l === 'bn' ? 'px-4 py-1 rounded-full border border-cyan-500 bg-cyan-500 text-black text-xs font-bold' : 'px-4 py-1 rounded-full border border-cyan-500 text-cyan-500 text-xs font-bold transition-all hover:bg-cyan-500/20';
+    document.getElementById('panel-title').innerText = l === 'en' ? "Strategic Analysis" : "কৌশলগত বিশ্লেষণ";
 }
 
 async function interrogate() {
     const query = document.getElementById('user-query').value;
     const output = document.getElementById('intel-output');
-    const display = document.getElementById('zara-voice-display');
+    const speech = document.getElementById('zara-speech');
     const avatar = document.getElementById('avatar-frame');
 
     if (!query) return;
 
-    // Visual State: Analysis
-    display.innerText = currentLang === 'en' ? "Accessing global news portals..." : "বৈশ্বিক নিউজ পোর্টালগুলো বিশ্লেষণ করছি...";
+    // Developer Recognition (Silent Protocol)
+    if (query.toLowerCase().includes("developer") || query.toLowerCase().includes("owner")) {
+        const devMsg = currentLang === 'en' ? 
+            "My architect is Manish Haldar. He is a Web4 developer based in Bangladesh." : 
+            "আমার নির্মাতা মনীষ হালদার। তিনি বাংলাদেশের একজন ওয়েব-ফোর ডেভেলপার।";
+        speech.innerText = `"${devMsg}"`;
+        speak(devMsg);
+        return;
+    }
+
+    // Initialize Analysis UI
+    speech.innerText = currentLang === 'en' ? "Accessing global intelligence..." : "বৈশ্বিক তথ্য সংগ্রহ করছি...";
     avatar.classList.add('speaking-pulse');
-    output.innerHTML = '<div class="animate-pulse">SYNTHESIZING DATA...</div>';
+    output.innerHTML = '<div class="flex items-center gap-3"><span class="w-3 h-3 bg-cyan-500 animate-ping rounded-full"></span> INTERROGATING GLOBAL NEWS NODES...</div>';
 
     try {
-        const url = `https://gnews.io/api/v4/search?q=${query}&lang=${currentLang}&token=${API_KEY}`;
+        // Build API URL (Bilingual support included)
+        const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=${currentLang}&max=5&token=${API_KEY}`;
+        
         const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`API_ERROR_${response.status}`);
+        }
+
         const data = await response.json();
 
         if (data.articles && data.articles.length > 0) {
             const first = data.articles[0];
-            const brief = currentLang === 'en' ? 
-                `Analysis complete. The top development is: ${first.title}.` : 
+            const voiceBrief = currentLang === 'en' ? 
+                `Analysis complete. The primary report concerns: ${first.title}.` : 
                 `বিশ্লেষণ সম্পন্ন। প্রধান খবরটি হলো: ${first.title}।`;
 
-            display.innerText = `"${brief}"`;
-            speak(brief);
+            speech.innerText = `"${voiceBrief}"`;
+            speak(voiceBrief);
 
-            // Generate HTML for the articles
-            let html = `<p class="mb-6 font-bold text-white underline tracking-widest uppercase">Intel Reports Found: ${data.articles.length}</p>`;
-            data.articles.slice(0, 5).forEach(art => {
+            // Populate the feed with reports
+            let html = `<p class="mb-6 font-bold text-cyan-400 border-b border-cyan-500/20 pb-2 uppercase tracking-tighter text-xs">Reports Found: ${data.articles.length}</p>`;
+            data.articles.forEach(art => {
                 html += `
-                    <div class="mb-6 pb-4 border-b border-white/5">
-                        <h4 class="text-cyan-400 font-bold uppercase text-sm mb-1">${art.title}</h4>
-                        <p class="text-xs opacity-50 mb-2">${art.description}</p>
-                        <a href="${art.url}" target="_blank" class="text-[10px] text-white border border-white/20 px-2 py-1 rounded hover:bg-white/10 transition-all">FULL INTEL</a>
+                    <div class="mb-8 group">
+                        <h4 class="text-white font-bold uppercase text-base mb-2 group-hover:text-cyan-400 transition-colors">${art.title}</h4>
+                        <p class="text-sm opacity-50 mb-3 leading-relaxed">${art.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] uppercase tracking-widest text-cyan-600">Source: ${art.source.name}</span>
+                            <a href="${art.url}" target="_blank" class="text-[10px] text-white border border-white/20 px-3 py-1 rounded hover:bg-cyan-500 hover:text-black hover:border-cyan-500 transition-all font-bold">ACCESS FULL INTEL</a>
+                        </div>
                     </div>
                 `;
             });
             output.innerHTML = html;
         } else {
-            const errorMsg = currentLang === 'en' ? "No live reports found for this query." : "এই বিষয়ের ওপর কোনো লাইভ রিপোর্ট পাওয়া যায়নি।";
-            display.innerText = errorMsg;
-            speak(errorMsg);
+            const noData = currentLang === 'en' ? "No intelligence found for this query." : "এই বিষয়ে কোনো তথ্য পাওয়া যায়নি।";
+            speech.innerText = noData;
+            speak(noData);
+            output.innerHTML = noData;
         }
     } catch (err) {
-        display.innerText = "Connection failed. Intelligence link severed.";
+        console.error("DIAGNOSTICS:", err);
+        const errText = currentLang === 'en' ? 
+            "Connection failed. The global link has been severed by your browser security." : 
+            "কানেকশন ফেইলড। আপনার ব্রাউজার সিকিউরিটির কারণে তথ্য সংগ্রহ করা সম্ভব হয়নি।";
+        speech.innerText = errText;
+        output.innerHTML = `<div class="text-red-500 font-bold uppercase text-xs">ERROR: ${err.message}<br><br>Check your GNews API Quota or enable CORS access.</div>`;
     }
 
-    setTimeout(() => avatar.classList.remove('speaking-pulse'), 5000);
+    setTimeout(() => avatar.classList.remove('speaking-pulse'), 4000);
 }
 
 function speak(text) {
@@ -63,14 +91,14 @@ function speak(text) {
     const msg = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
     
-    // Select the "Sexy/Smart" Female Voice
-    const female = voices.find(v => v.name.includes('Google US English') || v.name.includes('Zira') || v.name.includes('Samantha'));
-    if (female) msg.voice = female;
+    // Attempt to select a high-status female voice
+    const zaraVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Female'));
+    if (zaraVoice) msg.voice = zaraVoice;
 
-    msg.pitch = 1.3; // Sophisticated, high-status pitch
-    msg.rate = 0.85; // Slow, commanding pace
+    msg.pitch = 1.2; // Sophisticated pitch
+    msg.rate = 0.9;  // Controlled, powerful pace
     window.speechSynthesis.speak(msg);
 }
 
-// Pre-load voices
-window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+// Warm up speech synthesis
+window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
